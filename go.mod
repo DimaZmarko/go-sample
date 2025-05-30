@@ -1,10 +1,11 @@
 module go-sample
 
-go 1.23
+go 1.24.3
 
 require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gorilla/mux v1.8.1
+	github.com/joho/godotenv v1.5.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	gorm.io/driver/postgres v1.5.6
 	gorm.io/gorm v1.25.7

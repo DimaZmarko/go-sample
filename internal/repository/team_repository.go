@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 	"time"
+
 	"go-sample/internal/cache"
 	"go-sample/internal/models"
 
@@ -115,4 +116,4 @@ func (r *teamRepository) AddUser(teamID, userID uint) error {
 	r.cache.Delete("users_list")
 
 	return nil
-} 
+}

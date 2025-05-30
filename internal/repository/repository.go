@@ -21,4 +21,4 @@ type TeamRepository interface {
 	GetByID(id uint) (*models.Team, error)
 	List() ([]models.Team, error)
 	AddUser(teamID, userID uint) error
-} 
+}

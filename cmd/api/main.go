@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+
 	"go-sample/internal/app"
 )
 
@@ -16,4 +17,4 @@ func main() {
 	if err := application.Start(); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
-} 
+}

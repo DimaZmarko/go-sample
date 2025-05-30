@@ -41,23 +41,23 @@ type FileImportResult struct {
 }
 
 type ImportResponse struct {
-	TotalFiles   int               `json:"total_files"`
-	Results      []FileImportResult `json:"results"`
-	ProcessingTime string           `json:"processing_time"`
+	TotalFiles     int                `json:"total_files"`
+	Results        []FileImportResult `json:"results"`
+	ProcessingTime string             `json:"processing_time"`
 }
 
 func NewImportHandler(userRepo repository.UserRepository, teamRepo repository.TeamRepository) *ImportHandler {
 	return &ImportHandler{
 		userRepo:       userRepo,
 		teamRepo:       teamRepo,
-		maxFileWorkers: 5,                // Process up to 5 files concurrently
-		maxLineWorkers: 20,               // Process up to 20 lines concurrently per file
+		maxFileWorkers: 5,  // Process up to 5 files concurrently
+		maxLineWorkers: 20, // Process up to 20 lines concurrently per file
 	}
 }
 
 func (h *ImportHandler) ImportCSV(w http.ResponseWriter, r *http.Request) {
 	startTime := time.Now()
-	
+
 	var req ImportRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		ErrorResponse(w, http.StatusBadRequest, "Invalid request payload")
@@ -72,7 +72,7 @@ func (h *ImportHandler) ImportCSV(w http.ResponseWriter, r *http.Request) {
 	// Create a channel to limit concurrent file processing
 	fileWorkerCh := make(chan struct{}, h.maxFileWorkers)
 	var wg sync.WaitGroup
-	
+
 	// Create a slice to store results
 	var mu sync.Mutex
 	results := make([]FileImportResult, 0, len(req.Files))
@@ -93,19 +93,19 @@ func (h *ImportHandler) ImportCSV(w http.ResponseWriter, r *http.Request) {
 		}
 
 		wg.Add(1)
-		
+
 		// Acquire a worker slot
 		fileWorkerCh <- struct{}{}
-		
+
 		// Process file in a goroutine
 		go func(idx int, fileRequest ImportFileRequest) {
 			defer wg.Done()
 			defer func() { <-fileWorkerCh }() // Release worker slot when done
-			
+
 			// Process the file and get result
 			result := h.processFile(fileRequest.EntityType, fileRequest.Data)
 			result.EntityType = fileRequest.EntityType
-			
+
 			// Add result to results slice
 			mu.Lock()
 			results = append(results, result)
@@ -142,7 +142,7 @@ func (h *ImportHandler) processFile(entityType, data string) FileImportResult {
 
 	// Parse CSV
 	reader := csv.NewReader(strings.NewReader(string(decodedData)))
-	
+
 	// Read header
 	header, err := reader.Read()
 	if err != nil {
@@ -194,10 +194,10 @@ func (h *ImportHandler) processUserCSV(reader *csv.Reader, header []string) File
 	// Process each line
 	for lineNum, record := range records {
 		wg.Add(1)
-		
+
 		// Acquire a worker slot
 		lineWorkerCh <- struct{}{}
-		
+
 		// Process each line in a separate goroutine
 		go func(record []string, lineNum int) {
 			defer wg.Done()
@@ -206,7 +206,7 @@ func (h *ImportHandler) processUserCSV(reader *csv.Reader, header []string) File
 			// Validate record
 			if len(record) < len(header) {
 				mu.Lock()
-				result.FailedRecords = append(result.FailedRecords, 
+				result.FailedRecords = append(result.FailedRecords,
 					fmt.Sprintf("Line %d: Invalid number of fields", lineNum+1))
 				result.FailureCount++
 				mu.Unlock()
@@ -224,7 +224,7 @@ func (h *ImportHandler) processUserCSV(reader *csv.Reader, header []string) File
 			// Save user
 			if err := h.userRepo.Create(user); err != nil {
 				mu.Lock()
-				result.FailedRecords = append(result.FailedRecords, 
+				result.FailedRecords = append(result.FailedRecords,
 					fmt.Sprintf("Line %d: Failed to create user: %v", lineNum+1, err))
 				result.FailureCount++
 				mu.Unlock()
@@ -279,10 +279,10 @@ func (h *ImportHandler) processTeamCSV(reader *csv.Reader, header []string) File
 	// Process each line
 	for lineNum, record := range records {
 		wg.Add(1)
-		
+
 		// Acquire a worker slot
 		lineWorkerCh <- struct{}{}
-		
+
 		// Process each line in a separate goroutine
 		go func(record []string, lineNum int) {
 			defer wg.Done()
@@ -291,7 +291,7 @@ func (h *ImportHandler) processTeamCSV(reader *csv.Reader, header []string) File
 			// Validate record
 			if len(record) < len(header) {
 				mu.Lock()
-				result.FailedRecords = append(result.FailedRecords, 
+				result.FailedRecords = append(result.FailedRecords,
 					fmt.Sprintf("Line %d: Invalid number of fields", lineNum+1))
 				result.FailureCount++
 				mu.Unlock()
@@ -309,7 +309,7 @@ func (h *ImportHandler) processTeamCSV(reader *csv.Reader, header []string) File
 			// Save team
 			if err := h.teamRepo.Create(team); err != nil {
 				mu.Lock()
-				result.FailedRecords = append(result.FailedRecords, 
+				result.FailedRecords = append(result.FailedRecords,
 					fmt.Sprintf("Line %d: Failed to create team: %v", lineNum+1, err))
 				result.FailureCount++
 				mu.Unlock()
@@ -351,4 +351,4 @@ func findColumnIndex(header []string, columnName string) int {
 		}
 	}
 	return -1
-} 
+}

@@ -10,7 +10,7 @@ import (
 )
 
 type Cache struct {
-	redisClient  *redis.Client
+	redisClient *redis.Client
 	memoryCache *cache.Cache
 }
 
@@ -25,7 +25,7 @@ func NewCache(redisHost, redisPort string) *Cache {
 	memCache := cache.New(5*time.Minute, 10*time.Minute)
 
 	return &Cache{
-		redisClient:  rdb,
+		redisClient: rdb,
 		memoryCache: memCache,
 	}
 }
@@ -86,4 +86,4 @@ func (c *Cache) Delete(key string) error {
 	// Delete from memory cache
 	c.memoryCache.Delete(key)
 	return nil
-} 
+}

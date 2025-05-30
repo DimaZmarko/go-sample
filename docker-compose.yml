@@ -1,27 +1,27 @@
 version: '3.8'
 
 services:
-  app:
-    build:
-      context: .
-      dockerfile: .devcontainer/Dockerfile
-    volumes:
-      - .:/app
-    ports:
-      - "8081:8080"
-    depends_on:
-      - postgres
-      - redis
-    environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=myapp
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    tty: true
-    stdin_open: true
-    command: /bin/sh -c "while sleep 1000; do :; done"
+#  app:
+#    build:
+#      context: .
+#      dockerfile: .devcontainer/Dockerfile
+#    volumes:
+#      - .:/app
+#    ports:
+#      - "8081:8080"
+#    depends_on:
+#      - postgres
+#      - redis
+#    environment:
+#      - POSTGRES_HOST=postgres
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=postgres
+#      - POSTGRES_DB=myapp
+#      - REDIS_HOST=redis
+#      - REDIS_PORT=6379
+#    tty: true
+#    stdin_open: true
+#    command: /bin/sh -c "while sleep 1000; do :; done"
 
   postgres:
     image: postgres:latest

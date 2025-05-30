@@ -73,9 +73,9 @@ func initDatabase(cfg *config.Config) (*gorm.DB, error) {
 	var err error
 
 	for i := 0; i < 5; i++ {
-		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=5432 sslmode=disable",
-			cfg.PostgresHost, cfg.PostgresUser, cfg.PostgresPassword, cfg.PostgresDB)
-		
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+			cfg.PostgresHost, cfg.PostgresUser, cfg.PostgresPassword, cfg.PostgresDB, cfg.PostgresPort)
+
 		log.Printf("Attempting to connect to database... (attempt %d)", i+1)
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err == nil {
@@ -98,4 +98,4 @@ func initDatabase(cfg *config.Config) (*gorm.DB, error) {
 	log.Printf("Database migrations completed")
 
 	return db, nil
-} 
+}
